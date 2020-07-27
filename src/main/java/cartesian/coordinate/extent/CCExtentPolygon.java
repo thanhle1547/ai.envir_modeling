@@ -4,15 +4,15 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
+import cartesian.coordinate.CCExtentSystem;
 import cartesian.coordinate.CCPolygon;
-import cartesian.coordinate.CCSystem;
 
 /**
  * {@code CCExtentPolygon} represents a polygon in a Cartesian coordinate system, i.e.
  * a shape consisting of straight lines joined through points to form a circuit.
  *
  * @author thanhle1547
- * @see    CCSystem
+ * @see    CCExtentSystem
  */
 public class CCExtentPolygon extends CCPolygon {
     protected String id;

@@ -42,6 +42,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import cartesian.coordinate.extent.CCExtentLine;
 import cartesian.coordinate.extent.CCExtentPoint;
 import cartesian.coordinate.extent.CCExtentPolygon;
 import cartesian.coordinate.extent.CCRectangle;
@@ -112,6 +113,7 @@ public class CCExtentSystem extends JPanel {
 
     /* Object containers */
     private List<CCLine> lines;
+    private List<CCExtentLine> extentLines;
     private List<CCExtentPolygon> polygons;
     private List<CCPoint> points;
     private List<CCExtentPoint> sePoint;
@@ -214,6 +216,7 @@ public class CCExtentSystem extends JPanel {
         ulSize = 4;
 
         lines = new ArrayList<CCLine>();
+        extentLines = new ArrayList<>();
         polygons = new ArrayList<CCExtentPolygon>();
         points = new ArrayList<CCPoint>();
         sePoint = new ArrayList<>();
@@ -239,6 +242,10 @@ public class CCExtentSystem extends JPanel {
     public void add(CCLine line) {
         lines.add(line);
     }
+    
+    public void add(CCExtentLine line) {
+        extentLines.add(line);
+    }
 
     public void add(CCPoint point) {
         points.add(point);
@@ -253,6 +260,7 @@ public class CCExtentSystem extends JPanel {
      */
     public void clear() {
         lines.clear();
+        extentLines.clear();
         points.clear();
         polygons.clear();
         updateUI();
@@ -382,6 +390,21 @@ public class CCExtentSystem extends JPanel {
             drawLineHorizontal(g2d, line);
         else
             drawLineSlope(g2d, line);
+    }
+
+    /*
+     * Draw a Line.
+     */
+    private void drawLine(Graphics2D g2d, CCExtentLine line) {
+        g2d.setPaint(line.getPaint());
+        g2d.setStroke(line.getStroke());
+
+        int x1 = translateX(line.getX1());
+        int x2 = translateX(line.getX2());
+        int y1 = translateY(line.getY1());
+        int y2 = translateY(line.getY2());
+        
+        g2d.drawLine(x1, y1, x2, y2);
     }
 
     /* Assume a == 0.0 */
@@ -690,6 +713,10 @@ public class CCExtentSystem extends JPanel {
         return rh;
     }
 
+    public List<CCExtentLine> getExtentLines() {
+        return extentLines;
+    }
+
     public CCExtentPoint getStartPoint() {
         return sePoint.get(0);
     }
@@ -745,6 +772,8 @@ public class CCExtentSystem extends JPanel {
         for (CCExtentPolygon p : polygons)
             drawPolygon(g2d, p);
         for (CCLine line : lines)
+            drawLine(g2d, line);
+        for (CCExtentLine line: extentLines)
             drawLine(g2d, line);
 
         drawGrid(g2d);
@@ -1093,6 +1122,10 @@ public class CCExtentSystem extends JPanel {
             removeMouseWheelListener(mouseWheelListener);
 
         zoomable = !zoomable;
+    }
+
+    public void setExtentLines(List<CCExtentLine> extentLines) {
+        this.extentLines = extentLines;
     }
 
     /**

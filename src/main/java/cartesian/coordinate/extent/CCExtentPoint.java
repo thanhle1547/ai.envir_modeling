@@ -1,13 +1,13 @@
 package cartesian.coordinate.extent;
 
+import cartesian.coordinate.CCExtentSystem;
 import cartesian.coordinate.CCPoint;
-import cartesian.coordinate.CCSystem;
 
 /**
  * {@code CCExtentPoint} represents a point in a Cartesian coordinate system.
  *
  * @author thanhle1547
- * @see CCSystem
+ * @see CCExtentSystem
  */
 public class CCExtentPoint extends CCPoint {
     protected ExtentPointStyles style;

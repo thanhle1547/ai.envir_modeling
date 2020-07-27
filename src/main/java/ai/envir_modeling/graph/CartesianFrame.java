@@ -61,7 +61,7 @@ public class CartesianFrame extends JFrame implements ActionListener {
             customActionPanel;
     JButton btnImportFromFile, 
             btnRandomObstacles, 
-            btnClearAllObstacles,
+            btnClearAll,
             btnAddObstacle,
             btnChangeStartEndPoints,
             btnWorkspaceBoundary;
@@ -137,7 +137,7 @@ public class CartesianFrame extends JFrame implements ActionListener {
         // panel components
         btnImportFromFile = new JButton("Nhập từ file");
         btnRandomObstacles = new JButton("Tạo vật cản ngẫu nhiên");
-        btnClearAllObstacles = new JButton("Xóa tất cả chướng ngại vật");
+        btnClearAll = new JButton("Xóa tất cả");
         btnAddObstacle = new JButton("Thêm 1 chướng ngại vật");
         // btnChangeStartEndPoints = new JButton("<html><center>Thay đổi điểm<br/>bắt đầu và kết thúc</center></html>");
         btnChangeStartEndPoints = new JButton("Thay đổi điểm bắt đầu và kết thúc");
@@ -146,17 +146,19 @@ public class CartesianFrame extends JFrame implements ActionListener {
         // components style
         btnImportFromFile.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRandomObstacles.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnClearAllObstacles.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnClearAll.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAddObstacle.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnChangeStartEndPoints.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnWorkspaceBoundary.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        btnClearAll.setToolTipText("Ngoại trừ đường biên, điểm bắt đầu và điểm kết thúc sẽ không bị xóa");
 
         customActionPanel.setPreferredSize(capPreferredSize);
 
         // events
         btnImportFromFile.addActionListener(this);
         btnRandomObstacles.addActionListener(this);
-        btnClearAllObstacles.addActionListener(this);
+        btnClearAll.addActionListener(this);
         btnAddObstacle.addActionListener(this);
         btnChangeStartEndPoints.addActionListener(this);
         btnWorkspaceBoundary.addActionListener(this);
@@ -165,7 +167,7 @@ public class CartesianFrame extends JFrame implements ActionListener {
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(btnRandomObstacles);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
-        panel.add(btnClearAllObstacles);
+        panel.add(btnClearAll);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(new JSeparator());
 
@@ -173,11 +175,12 @@ public class CartesianFrame extends JFrame implements ActionListener {
         panel.add(btnAddObstacle);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(createObstaclePanel());
+        
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(btnChangeStartEndPoints);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(btnWorkspaceBoundary);
-
+        
         panel.add(customActionPanel);
         
         return panel;
@@ -320,7 +323,7 @@ public class CartesianFrame extends JFrame implements ActionListener {
                 drawObstacles(obstacles, cartesianPanel);
                 showListObstacles(obstacles, obstacleListModel);
             }
-        } else if (source == btnClearAllObstacles) {
+        } else if (source == btnClearAll) {
             cartesianPanel.clear();
         } else if (source == btnAddObstacle) {
             JOptionPaneTableOfPoints dialog = new JOptionPaneTableOfPoints(this);

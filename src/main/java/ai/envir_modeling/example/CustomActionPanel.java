@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import cartesian.coordinate.CCExtentSystem;
+import cartesian.coordinate.extent.CCExtentLine;
 
 /**
  * TODO: Custom this class as you want
@@ -32,6 +33,7 @@ public class CustomActionPanel extends JPanel implements ActionListener {
 
     CCExtentSystem cartesianPanel;
     JButton btnPerformSomething;
+    JButton btnDrawLines;
 
     public CustomActionPanel() {
         cartesianPanel = CCExtentSystem.getInstance();
@@ -41,15 +43,19 @@ public class CustomActionPanel extends JPanel implements ActionListener {
 
         // TODO: Change the name & text of btnPerformSomething
         btnPerformSomething = new JButton("Thực hiện gì đó");
+        btnDrawLines = new JButton("Vẽ các đường thẳng");
 
         btnPerformSomething.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnDrawLines.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         btnPerformSomething.addActionListener(this);
+        btnDrawLines.addActionListener(this);
 
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(Box.createVerticalGlue());
-        add(Box.createRigidArea(new Dimension(0, 10)));
         add(new JSeparator());
+        add(btnDrawLines);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         add(btnPerformSomething);
     }
 
@@ -57,6 +63,12 @@ public class CustomActionPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnPerformSomething) {
 
+        } else if (e.getSource() == btnDrawLines) {
+            // Vẽ đường chéo, ngang, thẳng
+            cartesianPanel.add(new CCExtentLine(3.0, 3.0, 15.0, 15.0));
+            cartesianPanel.add(new CCExtentLine(2.0, 2.0, 10.0, 2.0));
+            cartesianPanel.add(new CCExtentLine(8.0, 5.0, 8.0, 10.0));
+            cartesianPanel.repaint();
         }
     }
     
