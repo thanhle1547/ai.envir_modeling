@@ -1124,8 +1124,25 @@ public class CCExtentSystem extends JPanel {
         zoomable = !zoomable;
     }
 
-    public void setExtentLines(List<CCExtentLine> extentLines) {
-        this.extentLines = extentLines;
+    /**
+     * Clear the list and add new
+     */
+    public void setPointList(List<CCPoint> list) {
+        this.points = list;
+    }
+
+    /**
+     * Clear the list and add new
+     */
+    public void setExtentLineList(List<CCExtentLine> list) {
+        this.extentLines = list;
+    }
+
+    /**
+     * Clear the list and add new
+     */
+    public void setPolygonList(List<CCExtentPolygon> list) {
+        this.polygons = list;
     }
 
     /**

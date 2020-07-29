@@ -2,12 +2,10 @@ package ai.envir_modeling.graph;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -15,13 +13,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Paint;
+import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -36,7 +36,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ai.envir_modeling.graph.JOptionPaneTableOfPoints.ACTION;
 import cartesian.coordinate.CCExtentSystem;
@@ -65,6 +64,8 @@ public class CartesianFrame extends JFrame implements ActionListener {
             btnRandomObstacles, 
             btnClearAll,
             btnAddObstacle,
+            btnEditObstacle,
+            btnDeleteObstacle,
             btnChangeStartEndPoints,
             btnWorkspaceBoundary;
     JList<String> jListObstacle;
@@ -139,7 +140,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         // panel components
         btnRandomObstacles = new JButton("Tạo vật cản ngẫu nhiên");
         btnClearAll = new JButton("Xóa tất cả");
-        btnAddObstacle = new JButton("Thêm 1 chướng ngại vật");
         // btnChangeStartEndPoints = new JButton("<html><center>Thay đổi điểm<br/>bắt đầu và kết thúc</center></html>");
         btnChangeStartEndPoints = new JButton("Thay đổi điểm bắt đầu và kết thúc");
         btnWorkspaceBoundary = new JButton("Thay đổi ranh giới");
@@ -147,7 +147,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         // components style
         btnRandomObstacles.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnClearAll.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnAddObstacle.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnChangeStartEndPoints.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnWorkspaceBoundary.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -158,7 +157,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         // events
         btnRandomObstacles.addActionListener(this);
         btnClearAll.addActionListener(this);
-        btnAddObstacle.addActionListener(this);
         btnChangeStartEndPoints.addActionListener(this);
         btnWorkspaceBoundary.addActionListener(this);
 
@@ -170,8 +168,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(new JSeparator());
 
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
-        panel.add(btnAddObstacle);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(createObstaclePanel());
         
@@ -206,27 +202,52 @@ public class CartesianFrame extends JFrame implements ActionListener {
     }
 
     private JPanel createObstaclePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel lbjListObstacle = new JLabel("Danh sách các vật cản"),
-                lbjListObstacleTip = new JLabel("Ctrl + Chuột trái vào item để bỏ chọn");
+        JPanel  panel = new JPanel(new BorderLayout()),
+                actionPanel = new JPanel();
+        JLabel lbjListObstacleTip = new JLabel("Ctrl + Chuột trái vào item để bỏ chọn");
+        BufferedImage btnIcon;
         obstacleListModel = new DefaultListModel<>();
         jListObstacle = new JList<>(obstacleListModel);
+        btnAddObstacle = new JButton();
+        btnEditObstacle = new JButton();
+        btnDeleteObstacle = new JButton();
 
         // panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createTitledBorder("Danh sách các vật cản"));
 
-        lbjListObstacle.setHorizontalAlignment(SwingConstants.LEFT);
+        // btnAddObstacle.setAlignmentX(Component.CENTER_ALIGNMENT);
         lbjListObstacleTip.setHorizontalAlignment(SwingConstants.LEFT);
         lbjListObstacleTip.setForeground(Color.RED);
+
+        btnAddObstacle.setToolTipText("Thêm vật cản");
+        btnEditObstacle.setToolTipText("Sửa vật cản được chọn");
+        btnDeleteObstacle.setToolTipText("Xóa vật cản được chọn");
+        btnAddObstacle.setBackground(Color.WHITE);
+        btnAddObstacle.setOpaque(true);
+        btnEditObstacle.setBackground(Color.WHITE);
+        btnEditObstacle.setOpaque(true);
+        btnDeleteObstacle.setBackground(Color.WHITE);
+        btnDeleteObstacle.setOpaque(true);
 
         // JList.VERTICAL_WRAP: which specifies that the data be displayed from top to
         // bottom (as usual) before wrapping to a new column.
         jListObstacle.setLayoutOrientation(JList.VERTICAL_WRAP);
         jListObstacle.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        // jListObstacle.setMinimumSize(new Dimension(15, 10));
-        // jListObstacle.setPreferredSize(new Dimension(15, 10));
-        // jListObstacle.setMaximumSize(new Dimension(15, 10));
-        // jListObstacle.setVisibleRowCount(5);
 
+        try {
+            btnIcon = ImageIO.read(new FileInputStream("resources/icons8-plus-math-Fluent-16.png"));
+            btnAddObstacle.setIcon(new ImageIcon(btnIcon));
+            btnIcon = ImageIO.read(new FileInputStream("resources/icons8-design-Fluent-16.png"));
+            btnEditObstacle.setIcon(new ImageIcon(btnIcon));
+            btnIcon = ImageIO.read(new FileInputStream("resources/icons8-delete-Fluent-16.png"));
+            btnDeleteObstacle.setIcon(new ImageIcon(btnIcon));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        btnAddObstacle.addActionListener(this);
+        btnEditObstacle.addActionListener(this);
+        btnDeleteObstacle.addActionListener(this);
         jListObstacle.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -251,11 +272,14 @@ public class CartesianFrame extends JFrame implements ActionListener {
             }
         });
 
-        panel.add(lbjListObstacle, BorderLayout.PAGE_START);
+        actionPanel.add(btnAddObstacle);
+        actionPanel.add(btnEditObstacle);
+        actionPanel.add(btnDeleteObstacle);
+
+        panel.add(lbjListObstacleTip, BorderLayout.PAGE_START);
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.add(new JScrollPane(jListObstacle), BorderLayout.CENTER);
-        panel.add(lbjListObstacleTip, BorderLayout.PAGE_END);
-
+        panel.add(actionPanel, BorderLayout.PAGE_END);
         return panel;
     }
 
@@ -299,15 +323,38 @@ public class CartesianFrame extends JFrame implements ActionListener {
                 showListObstacles(obstacles, obstacleListModel);
             }
         } else if (source == btnClearAll) {
+            obstacles.clear();
             cartesianPanel.clear();
+            obstacleListModel.clear();
         } else if (source == btnAddObstacle) {
             JOptionPaneTableOfPoints dialog = new JOptionPaneTableOfPoints(this);
-            if (dialog.show(new CCExtentPolygon("#" + String.valueOf(obstacles.size()), new double[3], new double[3]),
+            if (dialog.show(new CCExtentPolygon("#" + String.valueOf(obstacles.size() + 1), new double[3], new double[3]),
                     ACTION.ADD) == JOptionPane.OK_OPTION) {
                 CCExtentPolygon result = dialog.getResult();
                 obstacles.add(result);
                 cartesianPanel.add(result);
                 obstacleListModel.add(obstacles.size() - 1, result.idToText());
+                cartesianPanel.repaint();
+            }
+        } else if (source == btnEditObstacle) {
+            JOptionPaneTableOfPoints dialog = new JOptionPaneTableOfPoints(this);
+            int index = jListObstacle.getSelectedIndex();
+            if (dialog.show(obstacles.get(index), ACTION.EDIT) == JOptionPane.OK_OPTION) {
+                CCExtentPolygon result = dialog.getResult();
+                obstacles.set(index, result);
+                cartesianPanel.setPolygon(index, result);
+                obstacleListModel.set(index, result.idToText());
+                cartesianPanel.setPolygonHighlightState(index, true);
+                cartesianPanel.repaint();
+            }
+        } else if (source == btnDeleteObstacle) {
+            int[] list = jListObstacle.getSelectedIndices();
+            if (list.length > 0) {
+                for (int i = list.length - 1; i >= 0; i--) {
+                    obstacles.remove(list[i]);
+                    obstacleListModel.remove(list[i]);
+                }
+                cartesianPanel.setPolygonList(obstacles);
                 cartesianPanel.repaint();
             }
         } else if (source == btnChangeStartEndPoints) {
