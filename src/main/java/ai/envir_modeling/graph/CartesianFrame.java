@@ -16,6 +16,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Paint;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -60,6 +61,7 @@ public class CartesianFrame extends JFrame implements ActionListener {
     JPanel  controlPanel,
             customActionPanel;
     JButton btnImportFromFile, 
+            btnExportToFile, 
             btnRandomObstacles, 
             btnClearAll,
             btnAddObstacle,
@@ -135,7 +137,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         ));
 
         // panel components
-        btnImportFromFile = new JButton("Nhập từ file");
         btnRandomObstacles = new JButton("Tạo vật cản ngẫu nhiên");
         btnClearAll = new JButton("Xóa tất cả");
         btnAddObstacle = new JButton("Thêm 1 chướng ngại vật");
@@ -144,7 +145,6 @@ public class CartesianFrame extends JFrame implements ActionListener {
         btnWorkspaceBoundary = new JButton("Thay đổi ranh giới");
 
         // components style
-        btnImportFromFile.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRandomObstacles.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnClearAll.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAddObstacle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -156,14 +156,13 @@ public class CartesianFrame extends JFrame implements ActionListener {
         customActionPanel.setPreferredSize(capPreferredSize);
 
         // events
-        btnImportFromFile.addActionListener(this);
         btnRandomObstacles.addActionListener(this);
         btnClearAll.addActionListener(this);
         btnAddObstacle.addActionListener(this);
         btnChangeStartEndPoints.addActionListener(this);
         btnWorkspaceBoundary.addActionListener(this);
 
-        panel.add(btnImportFromFile);
+        panel.add(createImExportPanel());
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(btnRandomObstacles);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -183,6 +182,26 @@ public class CartesianFrame extends JFrame implements ActionListener {
         
         panel.add(customActionPanel);
         
+        return panel;
+    }
+
+    private JPanel createImExportPanel() {
+        JPanel panel = new JPanel();
+
+        panel.setBorder(BorderFactory.createTitledBorder("Nhập/Xuất file thông tin vật cản"));
+
+        btnImportFromFile = new JButton("Nhập từ file");
+        btnExportToFile = new JButton("Xuất ra file");
+
+        btnImportFromFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnExportToFile.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        btnImportFromFile.addActionListener(this);
+        btnExportToFile.addActionListener(this);
+
+        panel.add(btnImportFromFile);
+        panel.add(btnExportToFile);
+
         return panel;
     }
 
@@ -253,62 +272,18 @@ public class CartesianFrame extends JFrame implements ActionListener {
         listModel.addAll(obstacleList.stream().map(p -> p.idToText()).collect(Collectors.toList()));
     }
 
-    private ArrayList<CCExtentPolygon> getObsatclesDataFrom(File file) throws FileNotFoundException {
-        ArrayList<CCExtentPolygon> obstacleList = new ArrayList<>();
-        Scanner scanner = new Scanner(file);
-        scanner.useLocale(Locale.US);
-        scanner.useDelimiter("\\s*");
-
-        /**
-         * Data example: 1#52.0:41.0,72.0:35.5 2#23.0:62.0 ...
-         */
-        while (scanner.hasNext()) {
-            /**
-             * obstacle[0] = "" obstacle[1] = "52.0:41.0,72.0:35.5"
-             * 
-             * strPoints[0] = "52.0:41.0" strPoints[1] = "72.0:35.5"
-             */
-            String id = scanner.nextLine();
-            String[] strPoints = scanner.nextLine().split(",\\n*"); // scanner.skip("\\d+#\\n*")
-            List<Double> xpoints = new ArrayList<>(), ypoints = new ArrayList<>();
-
-            for (int i = 0; i < strPoints.length; i++) {
-                String[] points = strPoints[i].split(":");
-
-                xpoints.add(Double.parseDouble(points[0]));
-                ypoints.add(Double.parseDouble(points[1]));
-            }
-
-            obstacleList.add(new CCExtentPolygon(id, xpoints.stream().mapToDouble(d -> d).toArray(),
-                    ypoints.stream().mapToDouble(d -> d).toArray()));
-        }
-
-        scanner.close();
-        return obstacleList;
-    }
-
-    private ArrayList<CCExtentPolygon> importFileThenFetch() {
-        JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text File (*.txt)", "txt");
-        fileChooser.setFileFilter(filter);
-        if (fileChooser.showOpenDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
-            try {
-                return getObsatclesDataFrom(fileChooser.getSelectedFile());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Failed to read file", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        return new ArrayList<>();
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == btnImportFromFile) {
-            obstacles = importFileThenFetch();
+            JFileChooserImportObstacles dialog = new JFileChooserImportObstacles(this, obstacles);
+            dialog.show();
+            obstacles = dialog.getResult();
             drawObstacles(obstacles, cartesianPanel);
             showListObstacles(obstacles, obstacleListModel);
+        } else if (source == btnExportToFile) {
+            JFileChooserExportObstacles dialog = new JFileChooserExportObstacles(this, obstacles);
+            dialog.show();
         } else if (source == btnRandomObstacles) {
             if (cartesianPanel.getWorkspaceBoundary().isEmpty()) {
                 JOptionPane.showMessageDialog(
