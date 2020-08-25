@@ -17,11 +17,11 @@ abstract public class JFileChooserImExportData {
 
     JFileChooser fileChooser;
     FileNameExtensionFilter textFileFilter = new FileNameExtensionFilter("Text File (*.txt)", "txt");
-    FileNameExtensionFilter javaDataFileFilter = new FileNameExtensionFilter("Java Data File (*.jdata)", "jdata");
 
     Component parentComponent;
 
     List<CCExtentPolygon> obstacles;
+    int response;
 
     private ACTION action;
 
@@ -35,12 +35,11 @@ abstract public class JFileChooserImExportData {
         if (action == ACTION.EXPORT)
             fileChooser.setSelectedFile(new File("Untitled.txt"));
         fileChooser.addChoosableFileFilter(textFileFilter);
-        fileChooser.addChoosableFileFilter(javaDataFileFilter);
         fileChooser.setFileFilter(textFileFilter);
     }
 
     public void show() {
-        int response = fileChooser.showSaveDialog(parentComponent);
+        response = fileChooser.showSaveDialog(parentComponent);
 
         if (response == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
@@ -55,11 +54,9 @@ abstract public class JFileChooserImExportData {
                         + ((FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0];
                 } else {
                     String extension = fileName.substring(indexOfExtension, fileName.length());
-                    path = fileChooser.getSelectedFile().getAbsolutePath() 
-                        + (!(extension == "txt" || extension == "jdata")
-                            ? "." + ((FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0]
-                            : ""
-                        );
+                    path = fileChooser.getSelectedFile().getAbsolutePath();
+                    if (!extension.equals(".txt"))
+                        path += "." + ((FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0];
                 }
                 
                 selectedFile = new File(path);
@@ -84,13 +81,13 @@ abstract public class JFileChooserImExportData {
 
             if (fileChooser.getFileFilter() == textFileFilter) {
                 onSelectTextFile(selectedFile);
-            } else if (fileChooser.getFileFilter() == javaDataFileFilter) {
-                onSelectJavaDataFile(selectedFile);
             }
         }
     }
 
     abstract protected void onSelectTextFile(File selectedFile);
 
-    abstract protected void onSelectJavaDataFile(File selectedFile);
+    public int getResponse() {
+        return response;
+    }
 }

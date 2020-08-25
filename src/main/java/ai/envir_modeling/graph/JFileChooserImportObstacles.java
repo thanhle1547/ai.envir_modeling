@@ -2,22 +2,13 @@ package ai.envir_modeling.graph;
 
 import java.awt.Component;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import cartesian.coordinate.extent.CCExtentPolygon;
 
@@ -36,20 +27,6 @@ public class JFileChooserImportObstacles extends JFileChooserImExportData {
             JOptionPane.showMessageDialog(
                 this.parentComponent, "Failed to read file", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    @Override
-    protected void onSelectJavaDataFile(File selectedFile) {
-        try {
-            FileInputStream readData = new FileInputStream(selectedFile);
-            ObjectInputStream readStream = new ObjectInputStream(readData);
-
-            this.obstacles = (ArrayList<CCExtentPolygon>) readStream.readObject();
-            readStream.close();
-        } catch (Exception e) {
-            //TODO: handle exception
-        }
-
     }
 
     public List<CCExtentPolygon> getResult() {

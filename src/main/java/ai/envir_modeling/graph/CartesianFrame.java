@@ -22,6 +22,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -302,6 +303,10 @@ public class CartesianFrame extends JFrame implements ActionListener {
         if (source == btnImportFromFile) {
             JFileChooserImportObstacles dialog = new JFileChooserImportObstacles(this, obstacles);
             dialog.show();
+
+            if (dialog.getResponse() == JFileChooser.CANCEL_OPTION)
+                return;
+            
             obstacles = dialog.getResult();
             drawObstacles(obstacles, cartesianPanel);
             showListObstacles(obstacles, obstacleListModel);
